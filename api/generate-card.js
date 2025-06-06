@@ -14,13 +14,23 @@ function getFewShotExamples() {
 }
 
 // Helper: build prompt for Gemini
-function buildPrompt(examples) {
+function buildPrompt(examples, avoidPairs) {
   let prompt = `You are an assistant for the board game Wavelength. Generate a new spectrum pair (opposites) in both English and Chinese. Output as JSON with keys: englishL, englishR, chineseL, chineseR.\nHere are some examples:`;
   for (const ex of examples) {
     prompt += `\n- English: ${ex['ENGLISH L']} / ${ex['ENGLISH R']}`;
     prompt += `\n  Chinese: ${ex['CHINESE L']} / ${ex['CHINESE R']}`;
   }
-  prompt += `\nNow generate a new, creative pair:`;
+  if (avoidPairs && avoidPairs.length > 0) {
+    prompt += `\nDo NOT generate any of these pairs (already used this session):`;
+    for (const pairStr of avoidPairs) {
+      try {
+        const pair = JSON.parse(pairStr);
+        prompt += `\n- English: ${pair.englishL} / ${pair.englishR}`;
+        prompt += `\n  Chinese: ${pair.chineseL} / ${pair.chineseR}`;
+      } catch {}
+    }
+  }
+  prompt += `\nNow generate a new, creative pair that is not in the avoid list above.`;
   return prompt;
 }
 
@@ -34,7 +44,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).end();
   }
 
-  if (req.method !== 'GET') {
+  if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
@@ -43,11 +53,25 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: 'Gemini API key not set in environment variables.' });
   }
 
+  let avoidPairs = [];
   try {
-    const examples = getFewShotExamples();
-    const prompt = buildPrompt(examples);
+    const body = await new Promise((resolve, reject) => {
+      let data = '';
+      req.on('data', chunk => { data += chunk; });
+      req.on('end', () => resolve(data));
+      req.on('error', reject);
+    });
+    if (body) {
+      const parsed = JSON.parse(body);
+      avoidPairs = parsed.avoidPairs || [];
+    }
+  } catch {}
 
-    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + GEMINI_API_KEY, {
+  const examples = getFewShotExamples();
+  const prompt = buildPrompt(examples, avoidPairs);
+
+  try {
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + GEMINI_API_KEY, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
