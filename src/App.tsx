@@ -105,7 +105,8 @@ function App() {
     }
     if (card) {
       setLlmCard(card)
-    } else {
+    } else if (!llmError) {
+      // Only set the uniqueness error if no other error was already set
       setLlmError('No new unique LLM card could be generated after several attempts.')
     }
     setLoading(false)
