@@ -57,7 +57,7 @@ const CATEGORY_LABELS = {
     entertainment: '🎮 娱乐',
     geography: '🌍 地理',
     sports: '⚽ 体育',
-    art: '🎨 艺术',
+    art: '🎨 文化艺术',
     science: '🔬 科学',
     literature: '📚 文学',
     history: '🏛️ 历史',
