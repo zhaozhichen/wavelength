@@ -1,7 +1,7 @@
-const fs = require('fs');
-const path = require('path');
-const { parse } = require('csv-parse/sync');
-const fetch = require('node-fetch');
+import fs from 'fs';
+import path from 'path';
+import { parse } from 'csv-parse/sync';
+import fetch from 'node-fetch';
 
 // Helper: get few-shot examples from CSV
 function getFewShotExamples() {
@@ -43,10 +43,10 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Gemini API key not set in environment variables.' });
   }
 
-  const examples = getFewShotExamples();
-  const prompt = buildPrompt(examples);
-
   try {
+    const examples = getFewShotExamples();
+    const prompt = buildPrompt(examples);
+
     const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + GEMINI_API_KEY, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
