@@ -14,21 +14,21 @@ const UI_TEXT = {
     title: 'Wavelength Card Generator',
     toggle: '🇨🇳 中文',
     random: '🎲 Random Card',
-    llm: '🤖 Generate with LLM',
+    ai: '🤖 Generate with AI',
     noCard: 'No card selected yet.',
     category: 'Category:',
     customCategory: 'Custom category...',
-    categoryNote: '(Only applies to LLM generation)',
+    categoryNote: '(Only applies to AI generation)',
   },
   zh: {
     title: '心电感应卡牌生成器',
     toggle: '🇬🇧 English',
     random: '🎲 随机卡牌',
-    llm: '🤖 用大模型生成',
+    ai: '🤖 用人工智能生成',
     noCard: '尚未选择卡牌。',
     category: '类别：',
     customCategory: '自定义类别...',
-    categoryNote: '（仅适用于大模型生成）',
+    categoryNote: '（仅适用于人工智能生成）',
   },
 };
 
@@ -94,11 +94,11 @@ function App() {
   const [currentCard, setCurrentCard] = useState<Card | null>(null)
   const [lang, setLang] = useState<'en' | 'zh'>('en')
   const [loading, setLoading] = useState(false)
-  const [llmCard, setLlmCard] = useState<Card | null>(null)
-  const [llmError, setLlmError] = useState<string | null>(null)
+  const [aiCard, setAiCard] = useState<Card | null>(null)
+  const [aiError, setAiError] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [customCategory, setCustomCategory] = useState<string>('')
-  const generatedLLMCards = useRef<Set<string>>(new Set())
+  const generatedAICards = useRef<Set<string>>(new Set())
 
   const t = UI_TEXT[lang];
 
@@ -126,8 +126,8 @@ function App() {
     if (cards.length === 0) return
     const idx = Math.floor(Math.random() * cards.length)
     setCurrentCard(cards[idx])
-    setLlmCard(null)
-    setLlmError(null)
+    setAiCard(null)
+    setAiError(null)
   }
 
   // Toggle language
@@ -135,17 +135,17 @@ function App() {
     setLang((prev) => (prev === 'en' ? 'zh' : 'en'))
   }
 
-  // Call LLM backend and ensure uniqueness in session
-  const generateLLMCard = async () => {
+  // Call AI backend and ensure uniqueness in session
+  const generateAICard = async () => {
     setLoading(true)
-    setLlmError(null)
-    setLlmCard(null)
+    setAiError(null)
+    setAiCard(null)
     let attempts = 0
     let card: Card | null = null
-    // Send all generated pairs (including the current llmCard and all previous ones)
-    const allGeneratedArr = Array.from(generatedLLMCards.current)
-    if (llmCard) {
-      allGeneratedArr.push(JSON.stringify(llmCard))
+    // Send all generated pairs (including the current aiCard and all previous ones)
+    const allGeneratedArr = Array.from(generatedAICards.current)
+    if (aiCard) {
+      allGeneratedArr.push(JSON.stringify(aiCard))
     }
     
     // Determine the category to use
@@ -164,27 +164,27 @@ function App() {
         if (!res.ok) throw new Error('Failed to generate')
         const data = await res.json()
         const cardStr = JSON.stringify(data)
-        if (!generatedLLMCards.current.has(cardStr)) {
-          generatedLLMCards.current.add(cardStr)
+        if (!generatedAICards.current.has(cardStr)) {
+          generatedAICards.current.add(cardStr)
           card = data
           break
         }
       } catch (e: unknown) {
-        setLlmError(e instanceof Error ? e.message : 'An error occurred')
+        setAiError(e instanceof Error ? e.message : 'An error occurred')
         break
       }
       attempts++
     }
     if (card) {
-      setLlmCard(card)
-    } else if (!llmError) {
+      setAiCard(card)
+    } else if (!aiError) {
       // Only set the uniqueness error if no other error was already set
-      setLlmError('No new unique LLM card could be generated after several attempts.')
+      setAiError('No new unique AI card could be generated after several attempts.')
     }
     setLoading(false)
   }
 
-  const card = llmCard || currentCard
+  const card = aiCard || currentCard
 
   return (
     <div className="app-container">
@@ -196,12 +196,12 @@ function App() {
         <button onClick={pickRandom} disabled={cards.length === 0}>
           {t.random}
         </button>
-        <button onClick={generateLLMCard} disabled={loading}>
-          {t.llm}
+        <button onClick={generateAICard} disabled={loading}>
+          {t.ai}
         </button>
       </div>
       
-      {/* Category selection for LLM generation */}
+      {/* Category selection for AI generation */}
       <div style={{ marginBottom: 24, padding: 16, background: '#f6f8fa', borderRadius: 8 }}>
         <div style={{ marginBottom: 12, fontSize: '0.9rem', fontWeight: 500 }}>
           {t.category} <span style={{ fontSize: '0.8rem', fontWeight: 400, color: '#666' }}>{t.categoryNote}</span>
@@ -258,7 +258,7 @@ function App() {
       ) : (
         <p>{t.noCard}</p>
       )}
-      {llmError && <p style={{ color: 'red' }}>{llmError}</p>}
+      {aiError && <p style={{ color: 'red' }}>{aiError}</p>}
     </div>
   )
 }
