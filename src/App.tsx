@@ -14,6 +14,24 @@ interface Card {
   englishR: string
 }
 
+// UI text translations
+const UI_TEXT = {
+  en: {
+    title: 'Wavelength Card Generator',
+    toggle: '🇨🇳 中文',
+    random: '🎲 Random Card',
+    llm: '🤖 Generate with LLM',
+    noCard: 'No card selected yet.',
+  },
+  zh: {
+    title: '心电感应卡牌生成器',
+    toggle: '🇬🇧 English',
+    random: '🎲 随机卡牌',
+    llm: '🤖 用大模型生成',
+    noCard: '尚未选择卡牌。',
+  },
+};
+
 function App() {
   const [cards, setCards] = useState<Card[]>([])
   const [currentCard, setCurrentCard] = useState<Card | null>(null)
@@ -21,6 +39,8 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [llmCard, setLlmCard] = useState<Card | null>(null)
   const [llmError, setLlmError] = useState<string | null>(null)
+
+  const t = UI_TEXT[lang];
 
   // Load CSV
   useEffect(() => {
@@ -76,16 +96,16 @@ function App() {
 
   return (
     <div className="app-container">
-      <h1>Wavelength Card Generator</h1>
+      <h1>{t.title}</h1>
       <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 24 }}>
         <button onClick={toggleLang} title="Toggle language">
-          {lang === 'en' ? '🇨🇳 中文' : '🇬🇧 English'}
+          {t.toggle}
         </button>
         <button onClick={pickRandom} disabled={cards.length === 0}>
-          🎲 Random Card
+          {t.random}
         </button>
         <button onClick={generateLLMCard} disabled={loading}>
-          🤖 Generate with LLM
+          {t.llm}
         </button>
       </div>
       {card ? (
@@ -101,7 +121,7 @@ function App() {
           </div>
         </div>
       ) : (
-        <p>No card selected yet.</p>
+        <p>{t.noCard}</p>
       )}
       {llmError && <p style={{ color: 'red' }}>{llmError}</p>}
     </div>
