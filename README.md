@@ -1,54 +1,60 @@
-# React + TypeScript + Vite
+# Wavelength Card Generator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A web-based assistant for the board game Wavelength. Randomly draw spectrum cards (in English and Chinese), toggle UI language, and generate new creative spectrum pairs using Gemini LLM.
 
-Currently, two official plugins are available:
+## ✨ Features
+- Toggle between Chinese 🇨🇳 and English 🇬🇧 UI and card text
+- Draw a random card from a CSV pool
+- Generate a new spectrum pair using Gemini LLM (AI)
+- Mobile-friendly, modern UI
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Local Development
 
-## Expanding the ESLint configuration
+1. **Clone the repo:**
+   ```sh
+   git clone https://github.com/zhaozhichen/wavelength.git
+   cd wavelength/web-wavelength
+   ```
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+2. **Install dependencies:**
+   ```sh
+   npm install
+   ```
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+3. **Set up your Gemini API key:**
+   - Copy `.env.example` to `.env.local`
+   - Paste your Gemini API key:
+     ```sh
+     cp .env.example .env.local
+     # Edit .env.local and set GEMINI_API_KEY=your_key_here
+     ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+4. **Run locally with Vercel dev:**
+   ```sh
+   npx vercel dev --listen 3000
+   ```
+   - Open [http://localhost:3000](http://localhost:3000)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🚀 Deploy to Vercel
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+1. **Push your code to GitHub**
+2. **Import the repo at [vercel.com](https://vercel.com)**
+3. **Set the environment variable** `GEMINI_API_KEY` in Vercel dashboard
+4. **Deploy!**
+
+## 🧩 Usage
+- **Toggle language**: Click the 🇨🇳/🇬🇧 button
+- **Draw random card**: Click 🎲
+- **Generate with LLM**: Click 🤖 (uses Gemini to create a new spectrum pair)
+
+## 📁 File Structure
+- `public/wavelength.csv` — Card data (English & Chinese)
+- `api/generate-card.js` — Vercel serverless function for LLM
+- `src/` — React frontend
+
+## 📝 Credits
+- Inspired by the board game [Wavelength](https://wavelength.zone/)
+- Built by [zhaozhichen](https://github.com/zhaozhichen)
+
+---
+PRs and issues welcome! 
