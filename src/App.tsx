@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './App.css'
 
 interface Card {
@@ -33,6 +33,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [llmCard, setLlmCard] = useState<Card | null>(null)
   const [llmError, setLlmError] = useState<string | null>(null)
+  const generatedLLMCards = useRef<Set<string>>(new Set())
 
   const t = UI_TEXT[lang];
 
@@ -69,21 +70,45 @@ function App() {
     setLang((prev) => (prev === 'en' ? 'zh' : 'en'))
   }
 
-  // Call LLM backend (to be implemented)
+  // Call LLM backend and ensure uniqueness in session
   const generateLLMCard = async () => {
     setLoading(true)
     setLlmError(null)
     setLlmCard(null)
-    try {
-      const res = await fetch('/api/generate-card')
-      if (!res.ok) throw new Error('Failed to generate')
-      const data = await res.json()
-      setLlmCard(data)
-    } catch (e: any) {
-      setLlmError(e.message)
-    } finally {
-      setLoading(false)
+    let attempts = 0
+    let card: Card | null = null
+    // Send all generated pairs (including the current llmCard and all previous ones)
+    const allGeneratedArr = Array.from(generatedLLMCards.current)
+    if (llmCard) {
+      allGeneratedArr.push(JSON.stringify(llmCard))
     }
+    while (attempts < 5) {
+      try {
+        const res = await fetch('/api/generate-card', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ avoidPairs: allGeneratedArr }),
+        })
+        if (!res.ok) throw new Error('Failed to generate')
+        const data = await res.json()
+        const cardStr = JSON.stringify(data)
+        if (!generatedLLMCards.current.has(cardStr)) {
+          generatedLLMCards.current.add(cardStr)
+          card = data
+          break
+        }
+      } catch (e: any) {
+        setLlmError(e.message)
+        break
+      }
+      attempts++
+    }
+    if (card) {
+      setLlmCard(card)
+    } else {
+      setLlmError('No new unique LLM card could be generated after several attempts.')
+    }
+    setLoading(false)
   }
 
   const card = llmCard || currentCard
