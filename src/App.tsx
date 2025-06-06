@@ -18,6 +18,7 @@ const UI_TEXT = {
     noCard: 'No card selected yet.',
     category: 'Category:',
     customCategory: 'Custom category...',
+    categoryNote: '(Only applies to LLM generation)',
   },
   zh: {
     title: '心电感应卡牌生成器',
@@ -27,6 +28,7 @@ const UI_TEXT = {
     noCard: '尚未选择卡牌。',
     category: '类别：',
     customCategory: '自定义类别...',
+    categoryNote: '（仅适用于大模型生成）',
   },
 };
 
@@ -202,7 +204,7 @@ function App() {
       {/* Category selection for LLM generation */}
       <div style={{ marginBottom: 24, padding: 16, background: '#f6f8fa', borderRadius: 8 }}>
         <div style={{ marginBottom: 12, fontSize: '0.9rem', fontWeight: 500 }}>
-          {t.category}
+          {t.category} <span style={{ fontSize: '0.8rem', fontWeight: 400, color: '#666' }}>{t.categoryNote}</span>
         </div>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
           <select
