@@ -1,7 +1,7 @@
-import fs from 'fs';
-import path from 'path';
-import { parse } from 'csv-parse/sync';
-import fetch from 'node-fetch';
+const fs = require('fs');
+const path = require('path');
+const { parse } = require('csv-parse/sync');
+const fetch = require('node-fetch');
 
 // Helper: get few-shot examples from CSV
 function getFewShotExamples() {
@@ -24,7 +24,7 @@ function buildPrompt(examples) {
   return prompt;
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
