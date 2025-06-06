@@ -1,12 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 
-// Emoji for language toggle
-const LANGUAGES = [
-  { code: 'en', label: '🇬🇧 English' },
-  { code: 'zh', label: '🇨🇳 中文' },
-]
-
 interface Card {
   chineseL: string
   chineseR: string
